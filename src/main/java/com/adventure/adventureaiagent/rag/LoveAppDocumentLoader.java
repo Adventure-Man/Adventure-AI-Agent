@@ -1,0 +1,54 @@
+package com.adventure.adventureaiagent.rag;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
+import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+@Slf4j
+public class LoveAppDocumentLoader {
+
+    private final ResourcePatternResolver resourcePatternResolver;
+
+    @Autowired
+    LoveAppDocumentLoader(ResourcePatternResolver resourcePatternResolver) {
+        this.resourcePatternResolver = resourcePatternResolver;
+        log.info("LoveAppDocumentLoader 构造器被调用");
+    }
+
+    /**
+     * 加载多个 Markdown 文档
+     * 读取本地知识库
+     * @return 文档列表
+     */
+    public List<Document> loadMarkdowns() throws IOException {
+        List<Document> allDocuments = new ArrayList<>();
+        try {
+            // 这里可以修改为你要加载的多个 Markdown 文件的路径模式
+            Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.md");
+            for (Resource resource : resources) {
+                String fileName = resource.getFilename();
+                MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
+                        .withHorizontalRuleCreateDocument(true)
+                        .withIncludeCodeBlock(false)
+                        .withIncludeBlockquote(false)
+                        .withAdditionalMetadata("filename", fileName)
+                        .build();
+                MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
+                allDocuments.addAll(reader.get());
+            }
+        } catch (IOException e) {
+            log.error("Markdown 文档加载失败", e);
+        }
+        return allDocuments;
+    }
+}
