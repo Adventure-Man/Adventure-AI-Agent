@@ -29,6 +29,7 @@ public class SearchApiTest {
         SearchApiTools searchApiTools = new SearchApiTools(apiKey);
         String result = searchApiTools.getSearchResult("动物");
         System.out.println(result);
+
     }
 
 }
