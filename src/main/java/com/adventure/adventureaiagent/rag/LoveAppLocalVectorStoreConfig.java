@@ -20,7 +20,6 @@ public class LoveAppLocalVectorStoreConfig {
     /**
      * 本地知识库通过EmbeddingModel向量转换 -- EmbeddingModel
      * @return
-     * @throws IOException
      */
 //    @Bean
 //    VectorStore loveAppVectorStoreDashscope(EmbeddingModel dashscopeEmbeddingModel) throws IOException {
@@ -33,7 +32,7 @@ public class LoveAppLocalVectorStoreConfig {
 //    }
 
     @Bean(name = "loveAppVectorStoreZhiPuAi")
-    VectorStore loveAppVectorStoreZhiPuAi(EmbeddingModel zhiPuAiEmbeddingModel) throws IOException {
+    VectorStore loveAppVectorStoreZhiPuAi(EmbeddingModel zhiPuAiEmbeddingModel) {
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(zhiPuAiEmbeddingModel)
                 .build();
         // 加载文档

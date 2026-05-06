@@ -1,5 +1,6 @@
 package com.adventure.adventureaiagent.loveapp;
 
+import com.adventure.adventureaiagent.common.constant.FileConstant;
 import com.adventure.adventureaiagent.rag.QueryRewriter;
 import com.adventure.adventureaiagent.tools.DateTimeTools;
 import com.adventure.adventureaiagent.tools.FileOperationTool;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
@@ -59,8 +61,8 @@ public class LoveApp {
 //    @Autowired
 //    private Advisor loveAppRagCloudAdvisor;
 
-//    @Resource
-//    private VectorStore loveAppVectorStore;
+    @Resource
+    private VectorStore loveAppVectorStore;
 
     @Resource
     private QueryRewriter queryRewriter;
@@ -93,7 +95,7 @@ public class LoveApp {
     @PostConstruct
     public void init() {
         this.chatClient = ChatClient.builder(zhiPuAiChatModel)
-                .defaultSystem("你是一个恋爱情感专家,你能回答用户的各种情感问题")
+                .defaultSystem(FileConstant.SYSTEM_PROMPT_LOVE_APP)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(fileBasedChatMemory).build())
                 .build();
     }
@@ -107,7 +109,10 @@ public class LoveApp {
         Flux<String> content = chatClient.prompt()
                 .user(message)
                 .advisors(new SimpleLoggerAdvisor())
-                .advisors(spec -> spec.param(CONVERSATION_ID, chatId))
+                // 多轮对话记忆 设置chatId参数，将参数传递给ChatMemory.add()
+                .advisors(spec -> spec.param(CONVERSATION_ID, chatId)
+                        // 基于内存对话记忆，设置记忆条数为10
+                        .param(TOP_K, 10))
                 .toolCallbacks(registerTools)
                 .stream()
                 .content();
@@ -124,7 +129,7 @@ public class LoveApp {
     public Flux<String> doChat(String message, String chatId) {
         String doQueryRewrite = queryRewriter.doQueryRewrite(message);
 //        ChatClient chatClient = ChatClient.builder(chatModel)
-//                .defaultSystem("你是一只狗,你只会回答“{voice}" )
+//                .defaultSystem("你是一只狗,你只会回答{voice}" )
 //                .build();
         Flux<String> content = chatClient.prompt()
                 .system(a -> a.param("voice", "汪汪汪"))
@@ -162,13 +167,13 @@ public class LoveApp {
         ChatResponse chatResponse = chatClient
                 .prompt()
                 .user(doQueryRewrite)
-//                .advisors(spec -> spec.param(CONVERSATION_ID, chatId)
-//                        .param(TOP_K, 10))
+                .advisors(spec -> spec.param(CONVERSATION_ID, chatId)
+                        .param(TOP_K, 10))
                 // 开启日志，便于观察效果
                 .advisors(new SimpleLoggerAdvisor())
                 // 应用知识库问答v
-                //.advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build())
-                //.advisors(loveAppRagCloudAdvisor)
+                .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build())
+//                .advisors(loveAppRagCloudAdvisor)
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();

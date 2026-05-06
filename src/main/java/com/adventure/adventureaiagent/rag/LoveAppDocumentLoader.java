@@ -30,7 +30,7 @@ public class LoveAppDocumentLoader {
      * 读取本地知识库
      * @return 文档列表
      */
-    public List<Document> loadMarkdowns() throws IOException {
+    public List<Document> loadMarkdowns() {
         List<Document> allDocuments = new ArrayList<>();
         try {
             // 这里可以修改为你要加载的多个 Markdown 文件的路径模式
