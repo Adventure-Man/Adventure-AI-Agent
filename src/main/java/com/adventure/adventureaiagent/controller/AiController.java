@@ -1,19 +1,25 @@
 package com.adventure.adventureaiagent.controller;
 
+import com.adventure.adventureaiagent.agent.model.AdventureManus;
+import com.adventure.adventureaiagent.common.resp.BaseResponse;
+import com.adventure.adventureaiagent.common.utils.ResultUtils;
 import com.adventure.adventureaiagent.loveapp.LoveApp;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
+import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/ai")
 public class AiController {
@@ -40,7 +46,10 @@ public class AiController {
      * @return
      */
     @GetMapping(value = "/love_app/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> doChatWithLoveAppSSE(String message, String chatId) {
+    public Flux<String> doChatWithLoveAppSSE(
+//            @NotBlank(message = "消息内容不能为空")
+//            @Size(max = 231, message = "消息内容不能超过231个字符")
+                                                  @RequestParam String message, @RequestParam String chatId) {
         return loveApp.doChatWithModelSse(message, chatId);
     }
 
@@ -56,7 +65,15 @@ public class AiController {
         Flux<ServerSentEvent<String>> map = loveApp.doChatWithModelSse(message, chatId)
                 .map(chunk -> ServerSentEvent.<String>builder()
                         .data(chunk)
-                        .build());
+                        .event("message")
+                        .build())
+                .onErrorResume(error -> {
+                    log.error("SSE聊天错误: {}", error.getMessage(), error);
+                    return Flux.just(ServerSentEvent.<String>builder()
+                            .data("{" + "error\":\"" + error.getMessage() + "\"}")
+                            .event("error")
+                            .build());
+                });
         return map;
     }
 
@@ -83,6 +100,38 @@ public class AiController {
                 );
         // 返回emitter
         return emitter;
+    }
+
+    @GetMapping("/api/love-expert/suggestions")
+    public BaseResponse<List<String>> getLoveExpertSuggestions() {
+        List<String> suggestions = List.of(
+                "单身如何提升自己,提高找对象的概率?",
+                "男朋友最近回消息很慢，是不是不爱我了？",
+                "婚后关系不太亲密,该如何做提高亲密性？");
+        return ResultUtils.success(suggestions);
+    }
+
+    /**
+     * 流式调用 Manus 超级智能体
+     *
+     * @param message
+     * @return
+     */
+    @GetMapping("/manus/chat")
+    public SseEmitter doChatWithManus(String message) {
+        AdventureManus adventureManus = new AdventureManus(allTools, zhiPuAiChatModel);
+        SseEmitter sseEmitter = adventureManus.runStream(message);
+        return sseEmitter;
+    }
+
+
+    @GetMapping("/api/manus-expert/suggestions")
+    public BaseResponse<List<String>> getManusExpertSuggestions() {
+        List<String> suggestions = List.of(
+                "单身如何提升自己,提高找对象的概率?",
+                "男朋友最近回消息很慢，是不是不爱我了？",
+                "婚后关系不太亲密,该如何做提高亲密性？");
+        return ResultUtils.success(suggestions);
     }
 
 }

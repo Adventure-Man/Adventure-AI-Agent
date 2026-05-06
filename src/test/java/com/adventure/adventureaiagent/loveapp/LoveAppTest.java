@@ -1,18 +1,12 @@
 package com.adventure.adventureaiagent.loveapp;
 
 import cn.hutool.core.lang.UUID;
-import com.adventure.adventureaiagent.apimodel.TongYiApiTest;
-import io.reactivex.Emitter;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
-import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("unused")
 @SpringBootTest
 class LoveAppTest {
@@ -26,7 +20,7 @@ class LoveAppTest {
     @Test
     void doChatWithZhiPuModel() {
         String chatId = UUID.randomUUID().toString();
-        String message = "我刚刚问什么来着？忘记了";
+        String message = "两对情侣出去吃饭，应该注意什么？";
         // sse 流式输出,打字机效果
         Flux<String> stringFlux = loveApp.doChatWithModelSse(message, chatId);
         stringFlux.doOnNext(System.out::println)
@@ -68,7 +62,6 @@ class LoveAppTest {
         String message = "我的名字是小明，我已经结婚了，但是婚后关系不太亲密，怎么办？";
         String answer =  loveApp.doChatWithMemory(message, chatId);
         Assertions.assertNotNull(answer);
-//
 //        String message1 = "你是谁？";
 //        String answer1 =  loveApp.doChatWithMemory(message1, chatId);
 //        Assertions.assertNotNull(answer1);
@@ -85,6 +78,7 @@ class LoveAppTest {
         String message = "我已经结婚了，但是婚后关系不太亲密，怎么办？";
 //        String message = "上海什么天气？";
         String answer =  loveApp.doChatWithRag(message, chatId);
+        System.out.println(answer);
         Assertions.assertNotNull(answer);
     }
 
