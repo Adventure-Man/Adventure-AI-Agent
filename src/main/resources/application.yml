@@ -43,3 +43,9 @@ cos:
     region: "${cos.client.region}"
     secret-id: "${cos.client.secret-id}"
     secret-key: "${cos.client.secret-key}"
+
+pdf:
+  font:
+    path: "${PDF_FONT_PATH:C:/Windows/Fonts/MiSans-Regular.otf}"
+    fallback: "C:/Windows/Fonts/msyh.ttc"
+    encoding: "${PDF_FONT_ENCODING:Identity-H}"

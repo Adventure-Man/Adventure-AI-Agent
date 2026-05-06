@@ -2,6 +2,9 @@ package com.adventure.adventureaiagent.common.exception;
 
 import com.adventure.adventureaiagent.common.enums.ErrorCode;
 import com.adventure.adventureaiagent.common.resp.BaseResponse;
+import com.adventure.adventureaiagent.common.utils.ResultUtils;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +57,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.ok(new BaseResponse<>(ErrorCode.SERVER_ERROR, "系统异常"));
     }
 
-    // 请求参数错误
+
+    /**
+     * 请求参数验证异常处理（@RequestBody + @Valid）
+     *
+     * @param ex 方法参数验证异常
+     * @return 统一响应结果
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
@@ -62,8 +71,41 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             errors.put(error.getField(), error.getDefaultMessage());
         });
-        log.error("ValidationException:{} - msg:{}", ex, errors);
-        return ResponseEntity.ok(new BaseResponse<>(ErrorCode.PARAMS_ERROR, "参数异常"));
+        String errorMessage = errors.values().stream()
+                .findFirst()
+                .orElse("参数验证失败");
+        log.error("MethodArgumentNotValidException: {}", errorMessage);
+        return ResponseEntity.ok(ResultUtils.error(ErrorCode.PARAMS_ERROR, errorMessage));
+    }
+
+
+    /**
+     * 参数约束验证异常处理（@RequestParam、@PathVariable + @Validated）
+     *
+     * @param ex 约束违反异常
+     * @return 统一响应结果
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<BaseResponse<?>> handleConstraintViolationException(ConstraintViolationException ex) {
+        String errorMessage = ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .findFirst()
+                .orElse("参数验证失败");
+        log.error("ConstraintViolationException: {}", errorMessage);
+        return ResponseEntity.ok(ResultUtils.error(ErrorCode.PARAMS_ERROR, errorMessage));
+    }
+
+    /**
+     * 非法参数异常处理
+     *
+     * @param e 非法参数异常
+     * @return 统一响应结果
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<BaseResponse<?>> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("IllegalArgumentException: {}", e.getMessage());
+        return ResponseEntity.ok(ResultUtils.error(ErrorCode.PARAMS_ERROR, e.getMessage()));
     }
 
 }
