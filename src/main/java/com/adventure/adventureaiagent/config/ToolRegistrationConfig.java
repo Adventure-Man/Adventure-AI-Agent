@@ -34,7 +34,7 @@ public class ToolRegistrationConfig {
                 new WeatherTools(),
                 new FileOperationTool(),
                 new SearchApiTools(apiKey),
-                new PDFGenerationTool(fontPath, fallbackFont, fontEncoding),
+                 new PDFGenerationTool(fontPath, fallbackFont, fontEncoding),
                 new ResourceDownloadTool(),
                 new WebScrapingTool(),
                 new TerminateTool()

@@ -2,7 +2,6 @@ package com.adventure.adventureaiagent.controller;
 
 import com.adventure.adventureaiagent.common.resp.BaseResponse;
 import com.adventure.adventureaiagent.common.utils.IpHelperUtils;
-import com.adventure.adventurefile.service.FileUploadService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +15,13 @@ import java.util.Map;
  */
 @RestController
 public class MainController {
-    @Autowired
-    private FileUploadService fileUploadService;
+//    @Autowired
+//    private FileUploadService fileUploadService;
 
-    @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile file) {
-        return fileUploadService.uploadFile(file);
-    }
+//    @PostMapping("/upload")
+//    public String upload(@RequestParam("file") MultipartFile file) {
+//        return fileUploadService.uploadFile(file);
+//    }
     /**
      * 健康检查
      *
