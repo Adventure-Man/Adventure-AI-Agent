@@ -19,7 +19,8 @@ server:
   servlet:
     context-path: /api
 
-# springdoc-openapi????
+
+# springdoc-openapi项目配置
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -31,18 +32,19 @@ springdoc:
     - group: 'api'
       paths-to-match: '/**'
       packages-to-scan: com.adventure.adventureaiagent.controller
+# knife4j的增强配置，不需要增强可以不配
 knife4j:
   enable: true
   setting:
     language: zh_cn
 
-cos:
-  client:
-    bucket: "${cos.client.bucket}"
-    host: "${cos.client.host}"
-    region: "${cos.client.region}"
-    secret-id: "${cos.client.secret-id}"
-    secret-key: "${cos.client.secret-key}"
+#cos:
+#  client:
+#    bucket: "${cos.client.bucket}"
+#    host: "${cos.client.host}"
+#    region: "${cos.client.region}"
+#    secret-id: "${cos.client.secret-id}"
+#    secret-key: "${cos.client.secret-key}"
 
 pdf:
   font:

@@ -145,7 +145,6 @@ public abstract class BaseAgent {
                         log.error("智能体执行错误",ex);
                         sseEmitter.completeWithError(ex);
                     }
-
                 } finally {
                     //3.清理资源
                     cleanup();

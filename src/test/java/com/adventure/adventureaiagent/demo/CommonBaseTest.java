@@ -12,7 +12,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static com.qcloud.cos.model.ExpressionType.SQL;
 
 /**
  * @author Adventure
