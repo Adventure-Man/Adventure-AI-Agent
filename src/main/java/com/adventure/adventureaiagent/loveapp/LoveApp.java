@@ -30,14 +30,12 @@ import static org.springframework.ai.chat.client.advisor.vectorstore.VectorStore
 @Slf4j
 @SuppressWarnings("all")
 public class LoveApp {
-    //@Autowired(required = false)
-    //private ChatModel dashScopeChatModel;
-
-    private ChatClient chatClient;
-
     @Autowired
-    @Qualifier("zhiPuAiChatModel")
-    private ChatModel zhiPuAiChatModel;
+    private ChatModel chatModel;
+
+//    @Autowired
+//    @Qualifier("zhiPuAiChatModel")
+//    private ChatModel zhiPuAiChatModel;
 
     @Resource
     private ToolCallback[] registerTools;
@@ -52,8 +50,8 @@ public class LoveApp {
 //    @Autowired
 //    private Advisor loveAppRagCloudAdvisor;
 
-    @Resource
-    private VectorStore loveAppVectorStore;
+//    @Resource
+//    private VectorStore loveAppVectorStore;
 
     @Resource
     private QueryRewriter queryRewriter;
@@ -83,9 +81,11 @@ public class LoveApp {
 //    1.构造函数执行
 //    2.依赖注入（@Autowired、@Resource 等）
 //    3.@PostConstruct 方法执行 ← 这时所有依赖都已注入完成
+
+    private ChatClient chatClient;
     @PostConstruct
     public void init() {
-        this.chatClient = ChatClient.builder(zhiPuAiChatModel)
+        this.chatClient = ChatClient.builder(chatModel)
                 .defaultSystem(FileConstant.SYSTEM_PROMPT_LOVE_APP)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(fileBasedChatMemory).build())
                 .build();

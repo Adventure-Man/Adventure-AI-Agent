@@ -31,7 +31,7 @@ public class AiController {
     private ToolCallback[] allTools;
 
     @Resource
-    private ChatModel zhiPuAiChatModel;
+    private ChatModel chatModel;
 
     @GetMapping("/love_app/chat/sync")
     public String doChatWithLoveAppSync(String message, String chatId) {
@@ -46,10 +46,7 @@ public class AiController {
      * @return
      */
     @GetMapping(value = "/love_app/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> doChatWithLoveAppSSE(
-//            @NotBlank(message = "消息内容不能为空")
-//            @Size(max = 231, message = "消息内容不能超过231个字符")
-                                                  @RequestParam String message, @RequestParam String chatId) {
+    public Flux<String> doChatWithLoveAppSSE(@RequestParam String message, @RequestParam String chatId) {
         return loveApp.doChatWithModelSse(message, chatId);
     }
 
@@ -102,14 +99,7 @@ public class AiController {
         return emitter;
     }
 
-    @GetMapping("/api/love-expert/suggestions")
-    public BaseResponse<List<String>> getLoveExpertSuggestions() {
-        List<String> suggestions = List.of(
-                "单身如何提升自己,提高找对象的概率?",
-                "男朋友最近回消息很慢，是不是不爱我了？",
-                "婚后关系不太亲密,该如何做提高亲密性？");
-        return ResultUtils.success(suggestions);
-    }
+
 
     /**
      * 流式调用 Manus 超级智能体
@@ -119,19 +109,24 @@ public class AiController {
      */
     @GetMapping("/manus/chat")
     public SseEmitter doChatWithManus(String message) {
-        AdventureManus adventureManus = new AdventureManus(allTools, zhiPuAiChatModel);
+        AdventureManus adventureManus = new AdventureManus(allTools, chatModel);
         SseEmitter sseEmitter = adventureManus.runStream(message);
         return sseEmitter;
     }
 
-
-    @GetMapping("/api/manus-expert/suggestions")
-    public BaseResponse<List<String>> getManusExpertSuggestions() {
+    /**
+     * 获取智能体的建议
+     *
+     * @return
+     */
+    @GetMapping("/love-expert/suggestions")
+    public BaseResponse<List<String>> getLoveExpertSuggestions() {
         List<String> suggestions = List.of(
                 "单身如何提升自己,提高找对象的概率?",
                 "男朋友最近回消息很慢，是不是不爱我了？",
                 "婚后关系不太亲密,该如何做提高亲密性？");
         return ResultUtils.success(suggestions);
     }
+
 
 }

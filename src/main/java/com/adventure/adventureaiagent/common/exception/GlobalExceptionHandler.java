@@ -3,6 +3,7 @@ package com.adventure.adventureaiagent.common.exception;
 import com.adventure.adventureaiagent.common.enums.ErrorCode;
 import com.adventure.adventureaiagent.common.resp.BaseResponse;
 import com.adventure.adventureaiagent.common.utils.ResultUtils;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.util.Map;
 @RestControllerAdvice
 @ResponseBody
 @Slf4j
+@Hidden
 public class GlobalExceptionHandler {
 
     // 拦截：未登录异常

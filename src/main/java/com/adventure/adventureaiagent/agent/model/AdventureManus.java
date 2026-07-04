@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdventureManus extends ToolCallAgent {
 
-    public AdventureManus(ToolCallback[] allTools, @Qualifier("zhiPuAiChatModel") ChatModel zhiPuAiChatModel) {
+    public AdventureManus(ToolCallback[] allTools,  ChatModel chatModel) {
 
         super(allTools);
         this.setName("AdventureManus");
@@ -31,7 +31,7 @@ public class AdventureManus extends ToolCallAgent {
         this.setNextStepPrompt(NEXT_STEP_PROMPT);
         this.setMaxStep(20);
         // 初始化客户端  
-        ChatClient chatClient = ChatClient.builder(zhiPuAiChatModel)
+        ChatClient chatClient = ChatClient.builder(chatModel)
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
         this.setChatClient(chatClient);

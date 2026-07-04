@@ -1,3 +1,7 @@
+app:
+  ai:
+    provider: dashscope
+
 spring:
   application:
     name: adventure-ai-agent
