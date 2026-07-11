@@ -1,6 +1,7 @@
 package com.adventure.adventureaiagent.controller;
 
 import com.adventure.adventureaiagent.agent.model.AdventureManus;
+import com.adventure.adventureaiagent.common.annotation.RateLimit;
 import com.adventure.adventureaiagent.common.resp.BaseResponse;
 import com.adventure.adventureaiagent.common.utils.ResultUtils;
 import com.adventure.adventureaiagent.loveapp.LoveApp;
@@ -45,6 +46,7 @@ public class AiController {
      * @param chatId
      * @return
      */
+//    @RateLimit(key = "love_app_sse", minuteLimit = 5, dayLimit = 20, monthLimit = 100)
     @GetMapping(value = "/love_app/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> doChatWithLoveAppSSE(@RequestParam String message, @RequestParam String chatId) {
         return loveApp.doChatWithModelSse(message, chatId);

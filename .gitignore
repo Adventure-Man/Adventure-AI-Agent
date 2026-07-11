@@ -3,6 +3,8 @@
 /src/main/resources/application-local.yml
 /src/main/resources/application-prod.yml
 /src/main/resources/mcp-servers.json
+agent-ai-front
+adventure-ai-agent-front
 
 HELP.md
 target/

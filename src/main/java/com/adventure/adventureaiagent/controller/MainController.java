@@ -1,5 +1,6 @@
 package com.adventure.adventureaiagent.controller;
 
+import com.adventure.adventureaiagent.common.annotation.RateLimit;
 import com.adventure.adventureaiagent.common.resp.BaseResponse;
 import com.adventure.adventureaiagent.common.utils.IpHelperUtils;
 import lombok.Data;
@@ -27,6 +28,7 @@ public class MainController {
      *
      * @return 响应
      */
+    @RateLimit(key = "love_app_sse", minuteLimit = 5, dayLimit = 20, monthLimit = 100)
     @GetMapping("/health")
     public String healthCheck() {
         return "Hello World!";

@@ -19,6 +19,7 @@ public enum ErrorCode {
     NOT_FOUND_ERROR(50004, "not_found_error", "数据不存在!"),
     NO_AUTH_ERROR(50010,"no_auth_error","无创建空间权限!"),
     NETWORK_AUTH_ERROR(50011,"Network Authentication Required","网络请求错误,请重试!"),
+    TOO_MANY_REQUESTS(42900, "too_many_requests", "访问过于频繁，请稍后再试"),
     ;
 
     private final int code;
