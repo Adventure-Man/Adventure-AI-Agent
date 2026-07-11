@@ -2,6 +2,7 @@ package com.adventure.adventureaiagent.loveapp;
 
 import com.adventure.adventureaiagent.common.constant.FileConstant;
 import com.adventure.adventureaiagent.rag.QueryRewriter;
+import com.adventure.adventureaiagent.tools.WeatherTools;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +84,7 @@ public class LoveApp {
 //    3.@PostConstruct 方法执行 ← 这时所有依赖都已注入完成
 
     private ChatClient chatClient;
+
     @PostConstruct
     public void init() {
         this.chatClient = ChatClient.builder(chatModel)
@@ -137,15 +139,20 @@ public class LoveApp {
      * @return
      */
     public String doChatWithMemory(String message, String chatId) {
-        String content = chatClient.prompt()
+        record Weather(String city, String temperature) {
+        }
+        Weather content = chatClient.prompt()
                 .user(message)
-                .advisors(spec -> spec.param("", chatId))
+                .advisors(spec -> spec.param("conversationId", chatId))
                 .advisors(new SimpleLoggerAdvisor())
+                .tools(new WeatherTools())
                 .call()
-                .content();
+                        .entity(Weather.class);
+//                .content();
         log.info("content: {}", content);
-        return content;
+        return content.toString();
     }
+
 
     /**
      * 构建rag知识库聊天

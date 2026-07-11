@@ -1,7 +1,9 @@
 package com.adventure.adventureaiagent.config;
 
+import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,24 @@ public class AiModelConfig {
         }
         if ("dashscope".equalsIgnoreCase(provider)) {
             return dashScopeChatModel;
+        }
+
+        throw new IllegalArgumentException("不支持的AI提供商: " + provider);
+    }
+
+    @Bean
+    @Primary
+    public EmbeddingModel primaryEmbeddingModel(
+            AiProviderProperties properties,
+            @Qualifier("zhiPuAiEmbeddingModel") EmbeddingModel zhiPuAiEmbeddingModel,
+            @Qualifier("dashscopeEmbeddingModel") EmbeddingModel dashScopeEmbeddingModel) {
+
+        String provider = properties.getProvider();
+        if ("zhipu".equalsIgnoreCase(provider)) {
+            return zhiPuAiEmbeddingModel;
+        }
+        if ("dashscope".equalsIgnoreCase(provider)) {
+            return dashScopeEmbeddingModel;
         }
 
         throw new IllegalArgumentException("不支持的AI提供商: " + provider);

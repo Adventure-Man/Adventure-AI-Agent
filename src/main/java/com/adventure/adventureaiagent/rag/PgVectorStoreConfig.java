@@ -25,10 +25,9 @@ public class PgVectorStoreConfig {
     @Resource
     private LoveAppDocumentLoader loveAppDocumentLoader;
 
-
     @Bean
-    public VectorStore vectorStore(JdbcTemplate jdbcTemplate, EmbeddingModel zhiPuAiEmbeddingModel) {
-        PgVectorStore pgVectorStore = PgVectorStore.builder(jdbcTemplate, zhiPuAiEmbeddingModel)
+    public VectorStore vectorStore(JdbcTemplate jdbcTemplate, EmbeddingModel embeddingModel) {
+        PgVectorStore pgVectorStore = PgVectorStore.builder(jdbcTemplate, embeddingModel)
                 .dimensions(1024)                    // Optional: defaults to model dimensions or 1536
                 .distanceType(COSINE_DISTANCE)       // Optional: defaults to COSINE_DISTANCE
                 .indexType(HNSW)                     // Optional: defaults to HNSW
@@ -41,4 +40,21 @@ public class PgVectorStoreConfig {
         pgVectorStore.add(documents);
         return pgVectorStore;
     }
+
+
+//    @Bean
+//    public VectorStore vectorStore(JdbcTemplate jdbcTemplate, EmbeddingModel zhiPuAiEmbeddingModel) {
+//        PgVectorStore pgVectorStore = PgVectorStore.builder(jdbcTemplate, zhiPuAiEmbeddingModel)
+//                .dimensions(1024)                    // Optional: defaults to model dimensions or 1536
+//                .distanceType(COSINE_DISTANCE)       // Optional: defaults to COSINE_DISTANCE
+//                .indexType(HNSW)                     // Optional: defaults to HNSW
+//                .initializeSchema(false)              // Optional: defaults to false
+//                .schemaName("public")                // Optional: defaults to "public"
+//                .vectorTableName("vector_store")     // Optional: defaults to "vector_store"
+//                .maxDocumentBatchSize(10000)         // Optional: defaults to 10000
+//                .build();
+//        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
+//        pgVectorStore.add(documents);
+//        return pgVectorStore;
+//    }
 }

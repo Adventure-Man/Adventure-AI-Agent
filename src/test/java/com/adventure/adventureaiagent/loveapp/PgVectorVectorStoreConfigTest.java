@@ -15,27 +15,27 @@ import java.util.Map;
 @SpringBootTest
 public class PgVectorVectorStoreConfigTest {
 
-//    @Resource
-//    VectorStore pgVectorVectorStore;
+    @Resource
+    VectorStore pgVectorVectorStore;
 
     @Resource
-    EmbeddingModel zhiPuAiEmbeddingModel;
+    EmbeddingModel embeddingModel;
 
     @Test
     void test() {
-        float[] embedding = zhiPuAiEmbeddingModel.embed("测试文本");
+        float[] embedding = embeddingModel.embed("测试文本");
         //当前模型输出维度
         System.out.println(embedding);
         System.out.println("当前模型输出维度: " + embedding.length);
 
-//        List<Document> documents = List.of(
-//                new Document("Spring AI rocks!! Spring AI rocks!! Spring AI rocks!! Spring AI rocks!! Spring AI rocks!!", Map.of("meta1", "meta1")),
-//                new Document("The World is Big and Salvation Lurks Around the Corner"),
-//                new Document("You walk forward facing the past and you turn back toward the future.", Map.of("meta2", "meta2")));
-//        // 添加文档
-//        pgVectorVectorStore.add(documents);
-//        // 相似度查询
-//        List<Document> results = pgVectorVectorStore.similaritySearch(SearchRequest.builder().query("Spring").topK(5).build());
-//        Assertions.assertNotNull(results);
+        List<Document> documents = List.of(
+                new Document("Spring AI rocks!! Spring AI rocks!! Spring AI rocks!! Spring AI rocks!! Spring AI rocks!!", Map.of("meta1", "meta1")),
+                new Document("The World is Big and Salvation Lurks Around the Corner"),
+                new Document("You walk forward facing the past and you turn back toward the future.", Map.of("meta2", "meta2")));
+        // 添加文档
+        pgVectorVectorStore.add(documents);
+        // 相似度查询
+        List<Document> results = pgVectorVectorStore.similaritySearch(SearchRequest.builder().query("Corner").topK(1).build());
+        Assertions.assertNotNull(results);
     }
 }

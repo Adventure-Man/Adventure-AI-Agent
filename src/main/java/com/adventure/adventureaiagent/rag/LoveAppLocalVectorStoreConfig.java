@@ -22,23 +22,23 @@ public class LoveAppLocalVectorStoreConfig {
      * 本地知识库通过EmbeddingModel向量转换 -- EmbeddingModel
      * @return
      */
-//    @Bean("loveAppVectorStoreDashscope")
-//    VectorStore loveAppVectorStoreDashscope(@Qualifier("dashscopeEmbeddingModel") EmbeddingModel dashscopeEmbeddingModel) throws IOException {
-//        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel)
+    @Bean("loveAppVectorStore")
+    VectorStore loveAppVectorStore(EmbeddingModel embeddingModel) throws IOException {
+        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(embeddingModel)
+                .build();
+        // 加载文档
+//        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
+//        simpleVectorStore.add(documents);
+        return simpleVectorStore;
+    }
+
+//    @Bean(name = "loveAppVectorStoreZhiPuAi")
+//    VectorStore loveAppVectorStoreZhiPuAi(@Qualifier("zhiPuAiEmbeddingModel") EmbeddingModel zhiPuAiEmbeddingModel) {
+//        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(zhiPuAiEmbeddingModel)
 //                .build();
 //        // 加载文档
 //        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
 //        simpleVectorStore.add(documents);
 //        return simpleVectorStore;
 //    }
-
-    @Bean(name = "loveAppVectorStoreZhiPuAi")
-    VectorStore loveAppVectorStoreZhiPuAi(@Qualifier("zhiPuAiEmbeddingModel") EmbeddingModel zhiPuAiEmbeddingModel) {
-        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(zhiPuAiEmbeddingModel)
-                .build();
-        // 加载文档
-        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
-        simpleVectorStore.add(documents);
-        return simpleVectorStore;
-    }
 }

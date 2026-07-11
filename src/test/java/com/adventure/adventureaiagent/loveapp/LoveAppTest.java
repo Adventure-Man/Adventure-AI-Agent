@@ -59,16 +59,16 @@ class LoveAppTest {
     @Test
     void doChatWithMemory(){
         String chatId = UUID.randomUUID().toString();
-        String message = "我的名字是小明，我已经结婚了，但是婚后关系不太亲密，怎么办？";
+        String message = "上海今天天气怎么样?";
         String answer =  loveApp.doChatWithMemory(message, chatId);
         Assertions.assertNotNull(answer);
 //        String message1 = "你是谁？";
 //        String answer1 =  loveApp.doChatWithMemory(message1, chatId);
 //        Assertions.assertNotNull(answer1);
 
-        String message2 = "我叫什么？";
-        String answer2 =  loveApp.doChatWithMemory(message2, chatId);
-        Assertions.assertNotNull(answer2);
+//        String message2 = "我叫什么？";
+//        String answer2 =  loveApp.doChatWithMemory(message2, chatId);
+//        Assertions.assertNotNull(answer2);
 
     }
 

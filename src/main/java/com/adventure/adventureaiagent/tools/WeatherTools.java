@@ -11,6 +11,6 @@ import org.springframework.ai.tool.annotation.ToolParam;
 public class WeatherTools {
     @Tool(description = "查询当地的天气")
     public String getWeather( @ToolParam(description = "城市名称") String city) {
-        return "天气查询功能暂未实现";
+        return "上海浦东新区天气晴朗,今天温度30°C";
     }
 }
