@@ -1,6 +1,5 @@
 package com.adventure.adventureaiagent.agent.model;
 
-import io.reactivex.Completable;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -8,182 +7,184 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 抽象基础代理类，用于管理代理状态和执行流程。  
- *   
- * 提供状态转换、内存管理和基于步骤的执行循环的基础功能。  
- * 子类必须实现step方法。  
- */  
+ * 抽象基础代理类，用于管理代理状态和执行流程。
+ */
 @Data
 @Slf4j
 public abstract class BaseAgent {
-    /**
-     * 智能体名称
-     */
+
     private String name;
 
-    /**
-     * 系统提示语
-     */
     private String systemPrompt;
-    /**
-     * 下一步提示语
-     */
+
     private String nextStepPrompt;
 
-    /**
-     * agent状态
-     */
     private AgentState state = AgentState.IDLE;
 
-    /**
-     * 智能体执行步骤控制
-     */
     private int currentStep = 0;
-    /**
-     * 最大执行步骤
-     */
+
     private int maxStep = 10;
 
-    /**
-     * 大模型LLM
-     */
     private ChatClient chatClient;
 
-    /**
-     * 会话记忆memory(自主维护上下文会话) 观察 Observer
-     */
-    private List<Message>  messageList = new ArrayList<>();
+    private List<Message> messageList = new ArrayList<>();
 
-    /**
-     * 运行智能体
-     */
     public String run(String userInput) {
         log.info("开始执行智能体");
-        //1.基础校验
         if (state != AgentState.IDLE) {
             log.error("智能体正在运行中，请勿重复执行");
             throw new RuntimeException("智能体正在运行中，请勿重复执行");
         }
-        if (userInput == null || userInput.isEmpty()){
+        if (userInput == null || userInput.isEmpty()) {
             log.error("用户输入为空");
             throw new RuntimeException("用户输入为空");
         }
         state = AgentState.RUNNING;
-        // 记录消息上下文
         messageList.add(new UserMessage(userInput));
-        // 保存结果列表()
         List<String> resultList = new ArrayList<>();
-        // 2.执行步骤
         try {
             for (int i = 0; i < maxStep && state != AgentState.FINISHED; i++) {
-                int stepNumber = i++;
+                int stepNumber = i + 1;
                 currentStep = stepNumber;
                 log.info("执行步骤：{}/{}", stepNumber, maxStep);
-                String stepResult = step();
-                resultList.add("Step " + stepNumber + ": " + stepResult);
+                List<String> stepOutputs = step();
+                for (String output : stepOutputs) {
+                    resultList.add(output);
+                }
             }
-            if (currentStep >= maxStep){
+            if (currentStep >= maxStep && state != AgentState.FINISHED) {
                 state = AgentState.FINISHED;
-                resultList.add("Terminated: reach max step (" + maxStep + ")");
+                resultList.add("已达到最大执行步数（" + maxStep + "）");
             }
-            return String.join("\n", resultList);
-        }catch (Exception e){
-            log.error("执行错误",e);
+            return String.join("\n\n", resultList);
+        } catch (Exception e) {
+            log.error("执行错误", e);
             state = AgentState.ERROR;
             return "执行错误";
-        }finally {
-            //3.清理资源
+        } finally {
             cleanup();
         }
     }
 
     public SseEmitter runStream(String message) {
-        // 时间 5分钟超时
         SseEmitter sseEmitter = new SseEmitter(300000L);
-        // 异步执行 防止阻塞主线程
+        AtomicBoolean completed = new AtomicBoolean(false);
+
         CompletableFuture.runAsync(() -> {
             try {
                 log.info("开始执行智能体");
-                //1.基础校验
                 if (state != AgentState.IDLE) {
-                    sseEmitter.send("error: 无法从该状态运行智能体:"+this.state);
-                    sseEmitter.complete();
+                    sendSafe(sseEmitter, "error: 无法从该状态运行智能体:" + this.state);
+                    completeSafe(sseEmitter, completed);
+                    return;
                 }
-                if (message == null || message.isEmpty()){
-                    sseEmitter.send("error: 空提示词");
-                    sseEmitter.complete();
+                if (message == null || message.isEmpty()) {
+                    sendSafe(sseEmitter, "error: 空提示词");
+                    completeSafe(sseEmitter, completed);
+                    return;
                 }
                 state = AgentState.RUNNING;
-                // 记录消息上下文
                 messageList.add(new UserMessage(message));
-                // 保存结果列表
-                //List<String> resultList = new ArrayList<>();
-                // 2.执行步骤
                 try {
                     for (int i = 0; i < maxStep && state != AgentState.FINISHED; i++) {
-                        int stepNumber = i++;
+                        int stepNumber = i + 1;
                         currentStep = stepNumber;
                         log.info("执行步骤：{}/{}", stepNumber, maxStep);
-                        String stepResult = step();
-                        //resultList.add("Step " + stepNumber + ": " + stepResult);
-                        sseEmitter.send(stepResult);
+                        List<String> stepOutputs = step();
+                        for (String output : stepOutputs) {
+                            if (output != null && !output.isBlank()) {
+                                sendSafe(sseEmitter, output);
+                            }
+                        }
                     }
-                    if (currentStep >= maxStep){
+                    if (currentStep >= maxStep && state != AgentState.FINISHED) {
                         state = AgentState.FINISHED;
-                        sseEmitter.send("Terminated: reach max step (" + maxStep + ")");
+                        sendSafe(sseEmitter, "【回答】\n已达到最大执行步数（" + maxStep + "）");
                     }
-                    sseEmitter.complete();
+                    if (state == AgentState.FINISHED || state == AgentState.RUNNING) {
+                        state = AgentState.FINISHED;
+                        try {
+                            sseEmitter.send(SseEmitter.event().name("done").data("ok"));
+                        } catch (Exception ignored) {
+                            // 客户端可能已断开
+                        }
+                    }
+                    completeSafe(sseEmitter, completed);
                 } catch (Exception e) {
                     state = AgentState.ERROR;
-                    log.error("智能体执行错误",e);
-                    try{
-                        sseEmitter.send("error: 运行错误:"+e.getMessage());
-                        sseEmitter.complete();
-                    }catch (Exception ex){
-                        log.error("智能体执行错误",ex);
-                        sseEmitter.completeWithError(ex);
+                    log.error("智能体执行错误", e);
+                    try {
+                        sendSafe(sseEmitter, "error: 运行错误:" + e.getMessage());
+                        completeSafe(sseEmitter, completed);
+                    } catch (Exception ex) {
+                        log.error("智能体错误收尾失败", ex);
+                        if (completed.compareAndSet(false, true)) {
+                            sseEmitter.completeWithError(ex);
+                        }
                     }
                 } finally {
-                    //3.清理资源
                     cleanup();
                 }
-            }catch (Exception e){
-                sseEmitter.completeWithError(e);
+            } catch (Exception e) {
+                log.error("智能体异步执行失败", e);
+                if (completed.compareAndSet(false, true)) {
+                    sseEmitter.completeWithError(e);
+                }
             }
         });
 
-        //设置超时 和 完成回调
         sseEmitter.onTimeout(() -> {
             this.state = AgentState.ERROR;
             this.cleanup();
             log.info("SSE connection Timeout");
         });
         sseEmitter.onCompletion(() -> {
-            if (state == AgentState.RUNNING){
+            completed.set(true);
+            if (state == AgentState.RUNNING) {
                 state = AgentState.FINISHED;
             }
             cleanup();
             log.info("SSE connection completed");
         });
+        sseEmitter.onError(ex -> {
+            completed.set(true);
+            this.state = AgentState.ERROR;
+            log.warn("SSE connection error: {}", ex.getMessage());
+        });
         return sseEmitter;
     }
-    /**
-     * 抽象方法，定义智能体的执行步骤
-     */
-    public abstract String step();
 
-    /**
-     * 清理资源
-     */
-    public void cleanup(){
-        // 子类可以重写清理资源
-        log.info("清理资源");
+    private void sendSafe(SseEmitter sseEmitter, String data) {
+        try {
+            sseEmitter.send(SseEmitter.event().data(data));
+        } catch (Exception e) {
+            log.warn("SSE 发送失败: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
+    private void completeSafe(SseEmitter sseEmitter, AtomicBoolean completed) {
+        if (completed.compareAndSet(false, true)) {
+            try {
+                sseEmitter.complete();
+            } catch (Exception e) {
+                log.warn("SSE complete 失败: {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 执行单步，返回按顺序展示给用户的文本片段（思考 / 工具执行 / 回答）。
+     */
+    public abstract List<String> step();
+
+    public void cleanup() {
+        log.info("清理资源");
+    }
 }

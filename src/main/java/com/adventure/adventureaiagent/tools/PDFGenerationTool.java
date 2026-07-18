@@ -38,7 +38,7 @@ public class PDFGenerationTool {
         this.fontEncoding = fontEncoding;
     }
 
-    @Tool(description = "Generate PDF file with given content")
+    @Tool(description = "将指定文本内容生成 PDF 文件。仅当用户明确要求生成/导出 PDF、做成文档时调用；禁止主动把回答内容做成 PDF。")
     public String generatePDF(@ToolParam(description = "Name of the PDF file to save (.pdf extension will be added automatically if not provided)") String fileName,
                               @ToolParam(description = "Text content to include in the PDF, supports Chinese characters") String content) {
         String fileDir = FileConstant.FILE_SAVE_DIR + "/pdf";
