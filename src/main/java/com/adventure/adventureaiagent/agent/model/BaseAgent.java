@@ -31,6 +31,9 @@ public abstract class BaseAgent {
      * 系统提示语
      */
     private String systemPrompt;
+    /**
+     * 下一步提示语
+     */
     private String nextStepPrompt;
 
     /**
@@ -53,7 +56,7 @@ public abstract class BaseAgent {
     private ChatClient chatClient;
 
     /**
-     * 会话记忆memory(自主维护上下文会话)
+     * 会话记忆memory(自主维护上下文会话) 观察 Observer
      */
     private List<Message>  messageList = new ArrayList<>();
 
@@ -74,7 +77,7 @@ public abstract class BaseAgent {
         state = AgentState.RUNNING;
         // 记录消息上下文
         messageList.add(new UserMessage(userInput));
-        // 保存结果列表
+        // 保存结果列表()
         List<String> resultList = new ArrayList<>();
         // 2.执行步骤
         try {
@@ -128,6 +131,7 @@ public abstract class BaseAgent {
                         currentStep = stepNumber;
                         log.info("执行步骤：{}/{}", stepNumber, maxStep);
                         String stepResult = step();
+                        //resultList.add("Step " + stepNumber + ": " + stepResult);
                         sseEmitter.send(stepResult);
                     }
                     if (currentStep >= maxStep){
@@ -178,6 +182,7 @@ public abstract class BaseAgent {
      * 清理资源
      */
     public void cleanup(){
+        // 子类可以重写清理资源
         log.info("清理资源");
     }
 

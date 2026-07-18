@@ -332,10 +332,10 @@ HttpResponse response = HttpRequest.post("https://dashscope.aliyuncs.com/api/v1/
 
 ```java
 // 使用智谱
-@Qualifier("zhiPuAiChatModel") ChatModel chatModel
+@Qualifier("zhiPuAiChatModel") ChatModel chatModel;
 
 // 使用千问（当前 LoveApp 中已注释）
-@Qualifier("dashScopeChatModel") ChatModel chatModel
+@Qualifier("dashScopeChatModel") ChatModel chatModel;
 ```
 
 ---

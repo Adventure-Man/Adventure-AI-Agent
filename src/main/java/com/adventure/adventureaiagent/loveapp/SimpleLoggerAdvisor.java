@@ -14,9 +14,19 @@ import reactor.core.publisher.Flux;
  * @description TODO
  */
 public class SimpleLoggerAdvisor implements CallAdvisor, StreamAdvisor {
+    private static final Logger logger = LoggerFactory.getLogger(SimpleLoggerAdvisor.class);
+    private void logRequest(ChatClientRequest request) {
+        // 记录请求
+        logger.debug("request: {}", request);
+    }
+
+    private void logResponse(ChatClientResponse chatClientResponse) {
+        // 记录响应
+        logger.debug("response: {}", chatClientResponse);
+    }
     // 实现方法...
 
-    private static final Logger logger = LoggerFactory.getLogger(SimpleLoggerAdvisor.class);
+
     @Override
     public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
         // 记录请求
@@ -26,6 +36,7 @@ public class SimpleLoggerAdvisor implements CallAdvisor, StreamAdvisor {
         ChatClientResponse chatClientResponse = callAdvisorChain.nextCall(chatClientRequest);
         // 记录响应
         logResponse(chatClientResponse);
+
         return chatClientResponse;
     }
 
@@ -38,15 +49,7 @@ public class SimpleLoggerAdvisor implements CallAdvisor, StreamAdvisor {
         return new ChatClientMessageAggregator().aggregateChatClientResponse(chatClientResponses, this::logResponse);
     }
 
-    private void logRequest(ChatClientRequest request) {
-        // 记录请求
-        logger.debug("request: {}", request);
-    }
 
-    private void logResponse(ChatClientResponse chatClientResponse) {
-        // 记录响应
-        logger.debug("response: {}", chatClientResponse);
-    }
 
     @Override
     public String getName() {

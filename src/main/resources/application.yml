@@ -1,6 +1,9 @@
 app:
   ai:
     provider: dashscope
+logging:
+  level:
+    root: info
 
 spring:
   application:

@@ -1,6 +1,7 @@
 package com.adventure.adventureaiagent.agent.model;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.graph.agent.interceptor.ToolCallResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,7 +45,10 @@ public class ToolCallAgent extends ReActAgent {
         super();
         this.availableTools = availableTools;
         this.toolCallingManager = ToolCallingManager.builder().build();
-        this.chatOptions = ZhiPuAiChatOptions.builder()
+//        this.chatOptions = ZhiPuAiChatOptions.builder()
+//                .internalToolExecutionEnabled(false)
+//                .build();
+        this.chatOptions = DashScopeChatOptions.builder()
                 .internalToolExecutionEnabled(false)
                 .build();
     }
