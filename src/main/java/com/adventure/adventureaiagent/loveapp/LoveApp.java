@@ -1,8 +1,8 @@
 package com.adventure.adventureaiagent.loveapp;
 
 import com.adventure.adventureaiagent.common.constant.FileConstant;
+import com.adventure.adventureaiagent.loveapp.advise.SimpleLoggerAdvisor;
 import com.adventure.adventureaiagent.rag.QueryRewriter;
-import com.adventure.adventureaiagent.tools.WeatherTools;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,172 +35,101 @@ public class LoveApp {
     @Autowired
     private ChatModel chatModel;
 
-//    @Autowired
-//    @Qualifier("zhiPuAiChatModel")
-//    private ChatModel zhiPuAiChatModel;
-
     @Resource
     private ToolCallback[] registerTools;
 
-//    @Resource
+//    @Resource()
 //    private ToolCallbackProvider toolCallbackProvider;
 
     @Resource
     @Qualifier("fileBasedChatMemory")
     private ChatMemory fileBasedChatMemory;
 
-//    @Autowired
-//    private Advisor loveAppRagCloudAdvisor;
+    //@Autowired
+    //private Advisor loveAppRagCloudAdvisor;
 
-//    @Resource
-//    private VectorStore loveAppVectorStore;
+    @Resource
+    private VectorStore vectorStore;
 
     @Resource
     private QueryRewriter queryRewriter;
 
-    /**
-     * 构造函数 构造一个基于dashScopeChatModel的模型
-     */
-    /*public LoveApp(@Qualifier("dashScopeChatModel")ChatModel dashScopeChatModel) {
-        this.chatModel = zhiPuAiChatModel;
-        this.chatClient = ChatClient.builder(chatModel)
-                .defaultSystem("你是一个恋爱情感专家,你能回答用户的各种情感问题")
-                .build();
-    }*/
-
-    /**
-     * 构造函数 构造一个基于智谱的模型会话记忆功能
-     * @param dashScopeChatModel
-     */
-
-//    public LoveApp(@Qualifier("zhiPuAiChatModel")ChatModel dashScopeChatModel) {
-//        this.chatClient = ChatClient.builder(dashScopeChatModel)
-//                .defaultSystem("你是一个恋爱情感专家,你能回答用户的各种情感问题")
-//                .defaultAdvisors(MessageChatMemoryAdvisor.builder(fileBasedChatMemory).build())
-//                .build();
-//    }
-    // PostConstruct:解决构造器加载时依赖还没注入的问题
-//    1.构造函数执行
-//    2.依赖注入（@Autowired、@Resource 等）
-//    3.@PostConstruct 方法执行 ← 这时所有依赖都已注入完成
+    /*
+    PostConstruct:解决构造器加载时依赖还没注入的问题
+    1.构造函数执行
+    2.依赖注入（@Autowired、@Resource 等）
+    3.@PostConstruct 方法执行 ← 这时所有依赖都已注入完成
+    */
 
     private ChatClient chatClient;
 
     @PostConstruct
     public void init() {
-        this.chatClient = ChatClient.builder(chatModel)
-                .defaultSystem(FileConstant.SYSTEM_PROMPT_LOVE_APP)
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(fileBasedChatMemory).build())
-                .build();
+        this.chatClient = ChatClient.builder(chatModel).defaultSystem(FileConstant.SYSTEM_PROMPT_LOVE_APP).defaultAdvisors(MessageChatMemoryAdvisor.builder(fileBasedChatMemory).build()).build();
+    }
+
+    record Weather(String city, String temperature) {
     }
 
     /**
      * sse 流式输出
+     *
      * @param message
      * @return
      */
     public Flux<String> doChatWithModelSse(String message, String chatId) {
+        // 1.1查询重写
+        // String doQueryRewrite = queryRewriter.doQueryRewrite(message);
         Flux<String> content = chatClient.prompt()
-                .user(message)
+                // 1.2 追加系统提示词
+                .system(FileConstant.SYSTEM_PROMPT_LOVE_APP).user(message)
+                // 1.3 advisors链 添加日志
                 .advisors(new SimpleLoggerAdvisor())
-                // 多轮对话记忆 设置chatId参数，将参数传递给ChatMemory.add()
-                .advisors(spec -> spec.param("conversationId", chatId)
-                        // 基于内存对话记忆，设置记忆条数为10
-                        .param(TOP_K, 10))
+                //.advisors(new MySimpleLoggerAdvisor())
+                // 2 Memory 多轮对话记忆 设置chatId参数，会话隔离  将参数传递给ChatMemory.add()
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId)
+                        // 2.1 传递参数 设置记忆条数为10
+                        .param(TOP_K, 20))
+                // 3. Function Calling工具注册
                 .toolCallbacks(registerTools)
-                .stream()
-                .content();
+                //.toolCallbacks(registerTools)
+                // 4. RAG 知识库
+                // 4.1 添加RAG 基于PgVectorStore 本地向量存储知识库
+                .advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
+                // 4.2 添加RAG 基于CloudVectorStore 跨云向量存储知识库
+                //.advisors(loveAppRagCloudAdvisor)
+                // 5. MCP
+                // 6. 流式输出 结构化输出(配置Json Schamer)
+                // 6.1 结构化输出
+                //.entity(Weather.class);
+                .stream().content();
+        // 6.2 聊天响应
+        //.chatResponse();
         log.info("content: {}", content);
         return content;
     }
 
 
     /**
-     * 聊天 1.查询重写 2.系统提示词变量传递
+     * MCP工具调用
+     *
      * @param message
      * @return
      */
-    public Flux<String> doChat(String message, String chatId) {
-        String doQueryRewrite = queryRewriter.doQueryRewrite(message);
-//        ChatClient chatClient = ChatClient.builder(chatModel)
-//                .defaultSystem("你是一只狗,你只会回答{voice}" )
-//                .build();
-        Flux<String> content = chatClient.prompt()
-                .system(a -> a.param("voice", "汪汪汪"))
-                .user(doQueryRewrite)
-                .stream()
-                .content();
-        log.info("content: {}", content);
-        return content;
-    }
-
-    /**
-     * 聊天 1.查询重写 2.系统提示词变量传递
-     * @param message
-     * @return
-     */
-    public String doChatWithMemory(String message, String chatId) {
-        record Weather(String city, String temperature) {
-        }
-        Weather content = chatClient.prompt()
+    public String doChatWithMcp(String message, String chatId) {
+        ChatResponse response = chatClient.prompt()
                 .user(message)
-                .advisors(spec -> spec.param("conversationId", chatId))
-                .advisors(new SimpleLoggerAdvisor())
-                .tools(new WeatherTools())
-                .call()
-                        .entity(Weather.class);
-//                .content();
-        log.info("content: {}", content);
-        return content.toString();
-    }
-
-
-    /**
-     * 构建rag知识库聊天
-     * @param message
-     * @return
-     */
-    public String doChatWithRag(String message, String chatId) {
-        // 查询重写
-        String doQueryRewrite = queryRewriter.doQueryRewrite(message);
-        ChatResponse chatResponse = chatClient
-                .prompt()
-                .user(doQueryRewrite)
-                .advisors(spec -> spec.param("conversationId", chatId)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId)
                         .param(TOP_K, 10))
                 // 开启日志，便于观察效果
                 .advisors(new SimpleLoggerAdvisor())
-                // 应用知识库问答v
-//                .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build())
-//                .advisors(loveAppRagCloudAdvisor)
-                .call()
-                .chatResponse();
-        String content = chatResponse.getResult().getOutput().getText();
-        log.info("content: {}", content);
-        return content;
-    }
-
-
-    /**
-     * 工具调用
-     * @param message
-     * @return
-     */
-/*    public String doChatWithMcp(String message, String chatId) {
-        ChatResponse response = chatClient
-                .prompt()
-                .user(message)
-//                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-//                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
-                // 开启日志，便于观察效果
-                .advisors(new SimpleLoggerAdvisor())
-                .tools(toolCallbackProvider)
-                .call()
-                .chatResponse();
+                //.tools(toolCallbackProvider)
+                //.toolCallbacks(toolCallbackProvider)
+                .call().chatResponse();
         String content = response.getResult().getOutput().getText();
         log.info("content: {}", content);
         return content;
-    }*/
+    }
 
 
 }

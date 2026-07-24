@@ -11,8 +11,12 @@ public class WebScrapingTool {
 
     public static final int MAX_CONTENT_LENGTH = 8000;
 
-    @Tool(description = "抓取指定网页的全文内容。仅当用户明确要求打开/抓取某 URL 时调用；禁止在普通问答或搜索完成后自动抓取搜到的链接。")
-    public String scrapeWebPage(@ToolParam(description = "URL of the web page to scrape") String url) {
+    @Tool(description = """
+            抓取指定网页的全文内容。
+            仅当用户明确要求打开、查看或抓取某个具体 URL 时调用。
+            禁止：普通问答、学习路线整理、搜索完成后自动抓取搜到的链接。
+            """)
+    public String scrapeWebPage(@ToolParam(description = "要抓取的网页 URL") String url) {
         try {
             Document doc = Jsoup.connect(url).get();
             return extractReadableContent(doc);

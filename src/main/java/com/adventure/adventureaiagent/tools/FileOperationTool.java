@@ -9,6 +9,12 @@ public class FileOperationTool {
 
     private final String FILE_DIR = FileConstant.FILE_SAVE_DIR + "/file";
 
+    /**
+     * Read content from a file
+     *
+     * @param fileName Name of the file to read
+     * @return Content of the file
+     */
     @Tool(description = "Read content from a file")
     public String readFile(@ToolParam(description = "Name of the file to read") String fileName) {
         String filePath = FILE_DIR + "/" + fileName;
@@ -19,6 +25,14 @@ public class FileOperationTool {
         }
     }
 
+
+    /**
+     * Write content to a file
+     *
+     * @param fileName Name of the file to write
+     * @param content  Content to write to the file
+     * @return Message indicating whether the file was written successfully
+     */
     @Tool(description = "Write content to a file")
     public String writeFile(
         @ToolParam(description = "Name of the file to write") String fileName,

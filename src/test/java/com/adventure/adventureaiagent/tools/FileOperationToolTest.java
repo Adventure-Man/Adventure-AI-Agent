@@ -1,6 +1,5 @@
-package com.adventure.adventureaiagent.demo;
+package com.adventure.adventureaiagent.tools;
 
-import com.adventure.adventureaiagent.tools.FileOperationTool;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

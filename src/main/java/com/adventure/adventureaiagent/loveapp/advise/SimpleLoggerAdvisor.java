@@ -1,4 +1,4 @@
-package com.adventure.adventureaiagent.loveapp;
+package com.adventure.adventureaiagent.loveapp.advise;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
  */
 public class SimpleLoggerAdvisor implements CallAdvisor, StreamAdvisor {
     private static final Logger logger = LoggerFactory.getLogger(SimpleLoggerAdvisor.class);
+
     private void logRequest(ChatClientRequest request) {
         // 记录请求
         logger.debug("request: {}", request);

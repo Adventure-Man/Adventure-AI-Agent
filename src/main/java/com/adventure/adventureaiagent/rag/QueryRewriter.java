@@ -13,12 +13,10 @@ public class QueryRewriter {
 
     private final QueryTransformer queryTransformer;
 
-    public QueryRewriter(@Qualifier("zhiPuAiChatModel")ChatModel chatModel) {
+    public QueryRewriter(ChatModel chatModel) {
         ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel);
         // 创建查询重写转换器
-        queryTransformer = RewriteQueryTransformer.builder()
-                .chatClientBuilder(chatClientBuilder)
-                .build();
+        queryTransformer = RewriteQueryTransformer.builder().chatClientBuilder(chatClientBuilder).build();
     }
 
     public String doQueryRewrite(String prompt) {

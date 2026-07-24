@@ -49,8 +49,15 @@
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.ai</groupId>-->
 <!--            <artifactId>spring-ai-mcp-client-spring-boot-starter</artifactId>-->
-<!--            <version>1.0.0-M6</version>-->
+<!--            <version>1.1.2</version>-->
 <!--        </dependency>-->
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-mcp -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-mcp</artifactId>
+            <version>1.1.2</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.itextpdf/itext-core -->
         <dependency>
             <groupId>com.itextpdf</groupId>

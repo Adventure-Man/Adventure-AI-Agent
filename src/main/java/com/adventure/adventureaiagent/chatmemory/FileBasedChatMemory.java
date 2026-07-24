@@ -61,12 +61,6 @@ public class FileBasedChatMemory implements ChatMemory {
         return allMessages;
     }
 
-//    @Override
-//    public List<Message> get(String conversationId, int lastN) {
-//        List<Message> allMessages = getOrCreateConversation(conversationId);
-//        return allMessages;
-//    }
-
     @Override
     public void clear(String conversationId) {
         File file = getConversationFile(conversationId);

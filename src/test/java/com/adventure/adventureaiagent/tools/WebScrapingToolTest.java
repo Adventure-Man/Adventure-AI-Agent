@@ -1,7 +1,5 @@
-package com.adventure.adventureaiagent.utils;
+package com.adventure.adventureaiagent.tools;
 
-import com.adventure.adventureaiagent.tools.ResourceDownloadTool;
-import com.adventure.adventureaiagent.tools.WebScrapingTool;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;

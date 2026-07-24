@@ -34,9 +34,23 @@ public class AiController {
     @Resource
     private ChatModel chatModel;
 
+
+
+    /**
+     * 流式调用 Manus 超级智能体
+     *
+     * @param message
+     * @return
+     */
+    @GetMapping("/manus/chat")
+    public SseEmitter doChatWithManus(String message) {
+        AdventureManus adventureManus = new AdventureManus(allTools, chatModel);
+        return adventureManus.runStream(message);
+    }
+
     @GetMapping("/love_app/chat/sync")
     public String doChatWithLoveAppSync(String message, String chatId) {
-        return loveApp.doChatWithMemory(message, chatId);
+        return loveApp.doChatWithMcp(message, chatId);
     }
 
     /**
@@ -99,21 +113,6 @@ public class AiController {
                 );
         // 返回emitter
         return emitter;
-    }
-
-
-
-    /**
-     * 流式调用 Manus 超级智能体
-     *
-     * @param message
-     * @return
-     */
-    @GetMapping("/manus/chat")
-    public SseEmitter doChatWithManus(String message) {
-        AdventureManus adventureManus = new AdventureManus(allTools, chatModel);
-        SseEmitter sseEmitter = adventureManus.runStream(message);
-        return sseEmitter;
     }
 
     /**

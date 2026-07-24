@@ -4,6 +4,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
@@ -21,7 +22,7 @@ public class DateTimeTools {
             """)
     public String getCurrentDateTime() {
         ZoneId zoneId = LocaleContextHolder.getTimeZone().toZoneId();
-        LocalDate today = LocalDate.now(zoneId);
+        LocalDateTime today = LocalDateTime.now(zoneId);
         return today.format(DATE_FORMATTER);
     }
 }

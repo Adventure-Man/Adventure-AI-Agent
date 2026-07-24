@@ -1,6 +1,6 @@
 package com.adventure.adventureaiagent.agent.model;
 
-import com.adventure.adventureaiagent.loveapp.SimpleLoggerAdvisor;
+import com.adventure.adventureaiagent.loveapp.advise.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;

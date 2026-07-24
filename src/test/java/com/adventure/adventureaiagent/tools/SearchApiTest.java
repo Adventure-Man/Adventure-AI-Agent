@@ -1,13 +1,9 @@
-package com.adventure.adventureaiagent.utils;
+package com.adventure.adventureaiagent.tools;
 
-import com.adventure.adventureaiagent.tools.ResourceDownloadTool;
-import com.adventure.adventureaiagent.tools.SearchApiTools;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.io.IOException;
 
 /**
  * @author Adventure

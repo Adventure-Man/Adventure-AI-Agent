@@ -26,8 +26,11 @@ public class SearchApiTools {
         this.apiKey = apiKey;
     }
 
-    @Tool(description = "联网搜索资料，用于查询学习路线、常识问答、推荐与总结等。多数情况下搜索后即可直接回答，无需再调用其他工具。")
-    public String getSearchResult( @ToolParam(description = "search query key") String query) {
+    @Tool(description = """
+            联网搜索资料（百度）。用于查询学习路线、常识问答、推荐与总结等，是问答类任务的首选工具。
+            多数情况下搜索摘要已足够直接回答用户，搜索后不要再调用 scrapeWebPage 或 generatePDF。
+            """)
+    public String getSearchResult(@ToolParam(description = "搜索关键词") String query) {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("engine", "baidu");
         paramMap.put("q", query);

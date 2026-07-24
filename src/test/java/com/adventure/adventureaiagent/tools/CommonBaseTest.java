@@ -1,8 +1,6 @@
-package com.adventure.adventureaiagent.demo;
+package com.adventure.adventureaiagent.tools;
 
-import com.adventure.adventureaiagent.tools.WeatherTools;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;

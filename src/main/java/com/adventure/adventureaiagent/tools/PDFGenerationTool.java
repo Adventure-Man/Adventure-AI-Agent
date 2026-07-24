@@ -38,9 +38,13 @@ public class PDFGenerationTool {
         this.fontEncoding = fontEncoding;
     }
 
-    @Tool(description = "将指定文本内容生成 PDF 文件。仅当用户明确要求生成/导出 PDF、做成文档时调用；禁止主动把回答内容做成 PDF。")
-    public String generatePDF(@ToolParam(description = "Name of the PDF file to save (.pdf extension will be added automatically if not provided)") String fileName,
-                              @ToolParam(description = "Text content to include in the PDF, supports Chinese characters") String content) {
+    @Tool(description = """
+            将指定文本内容生成 PDF 文件。
+            仅当用户明确要求生成/导出 PDF、做成文档、保存为文件时调用。
+            禁止：用户只是提问或要学习建议时，主动把回答做成 PDF。
+            """)
+    public String generatePDF(@ToolParam(description = "PDF 文件名（可省略 .pdf 后缀）") String fileName,
+                              @ToolParam(description = "写入 PDF 的文本内容，支持中文") String content) {
         String fileDir = FileConstant.FILE_SAVE_DIR + "/pdf";
         try {
             // 创建pdf目录

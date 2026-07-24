@@ -53,21 +53,6 @@ public class AiModelConfig {
         throw new IllegalArgumentException("不支持的AI提供商: " + provider);
     }
 
-//    @Bean
-//    @Primary
-//    public ChatOptions primaryChatOptions(
-//            AiProviderProperties properties) {
-//
-//        String provider = properties.getProvider();
-//        if ("zhipu".equalsIgnoreCase(provider)) {
-//            return new ZhiPuAiChatOptions();
-//        }
-//        if ("dashscope".equalsIgnoreCase(provider)) {
-//            return new DashScopeChatOptions();
-//        }
-//
-//        throw new IllegalArgumentException("不支持的AI提供商: " + provider);
-//    }
 
     @Bean
     @Primary

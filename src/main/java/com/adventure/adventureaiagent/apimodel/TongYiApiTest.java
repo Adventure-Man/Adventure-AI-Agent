@@ -27,7 +27,7 @@ public class TongYiApiTest {
                 .build();
         Message userMsg = Message.builder()
                 .role(Role.USER.getValue())
-                .content("你是谁？")
+                .content("213？")
                 .build();
         List<Message> list = Arrays.asList(systemMsg, userMsg);
         GenerationParam param = GenerationParam.builder()
