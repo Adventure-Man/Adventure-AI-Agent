@@ -5,6 +5,7 @@
 /src/main/resources/mcp-servers.json
 agent-ai-front
 adventure-ai-agent-front
+src/main/resources/prompt
 
 HELP.md
 target/

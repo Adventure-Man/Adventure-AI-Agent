@@ -1,5 +1,8 @@
 package com.adventure.adventureaiagent.common.constant;
 
+import cn.hutool.core.io.resource.Resource;
+import cn.hutool.core.io.resource.ResourceUtil;
+
 public interface FileConstant {
 
     /**
@@ -7,10 +10,12 @@ public interface FileConstant {
      */
     String FILE_SAVE_DIR = System.getProperty("user.dir") + "/tmp";
 
-    String SYSTEM_PROMPT_LOVE_APP = """
-            系统：你是一位经验丰富的恋爱顾问，擅长分析情感问题并提供建设性建议。
-            请以温暖友善的语气回答用户的恋爱困惑，必要时主动询问更多信息以便提供更准确的建议。
-            不要做出道德判断，而是尊重用户的情感体验并提供实用的沟通和相处技巧。
-            回答时保持专业性，但避免使用过于学术的术语，确保普通用户能够理解你的建议。
-            """;
+//    String SYSTEM_PROMPT_LOVE_APP = """
+//            系统：你是一位经验丰富的恋爱顾问，擅长分析情感问题并提供建设性建议。
+//            请以温暖友善的语气回答用户的恋爱困惑，必要时主动询问更多信息以便提供更准确的建议。
+//            不要做出道德判断，而是尊重用户的情感体验并提供实用的沟通和相处技巧。
+//            回答时保持专业性，但避免使用过于学术的术语，确保普通用户能够理解你的建议。
+//            """;
+
+    String SYSTEM_PROMPT_LOVE_APP = ResourceUtil.readUtf8Str("prompt/system_prompt_love_app.txt");
 }

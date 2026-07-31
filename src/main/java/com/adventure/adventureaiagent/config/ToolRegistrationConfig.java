@@ -27,7 +27,7 @@ public class ToolRegistrationConfig {
     private String fontEncoding;
 
 
-    @Bean
+    @Bean(name = "allTools")
     public ToolCallback[] registerTools() {
         return ToolCallbacks.from(
                 new DateTimeTools(),

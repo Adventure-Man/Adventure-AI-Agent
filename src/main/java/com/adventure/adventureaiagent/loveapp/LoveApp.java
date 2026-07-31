@@ -82,7 +82,8 @@ public class LoveApp {
         // String doQueryRewrite = queryRewriter.doQueryRewrite(message);
         Flux<String> content = chatClient.prompt()
                 // 1.2 追加系统提示词
-                .system(FileConstant.SYSTEM_PROMPT_LOVE_APP).user(message)
+                .system(FileConstant.SYSTEM_PROMPT_LOVE_APP)
+                .user(message)
                 // 1.3 advisors链 添加日志
                 .advisors(new SimpleLoggerAdvisor())
                 //.advisors(new MySimpleLoggerAdvisor())
@@ -95,7 +96,7 @@ public class LoveApp {
                 //.toolCallbacks(registerTools)
                 // 4. RAG 知识库
                 // 4.1 添加RAG 基于PgVectorStore 本地向量存储知识库
-                .advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
+                //.advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
                 // 4.2 添加RAG 基于CloudVectorStore 跨云向量存储知识库
                 //.advisors(loveAppRagCloudAdvisor)
                 // 5. MCP

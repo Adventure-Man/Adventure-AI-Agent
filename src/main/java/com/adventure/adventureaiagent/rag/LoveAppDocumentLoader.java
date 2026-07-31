@@ -41,6 +41,7 @@ public class LoveAppDocumentLoader {
                         .withHorizontalRuleCreateDocument(true)
                         .withIncludeCodeBlock(false)
                         .withIncludeBlockquote(false)
+                         // 添加元数据 Metadata过滤优化Rag 向量库检索
                         .withAdditionalMetadata("filename", fileName)
                         .build();
                 MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
